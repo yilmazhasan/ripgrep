@@ -74,6 +74,7 @@ pub(super) const FLAGS: &[&dyn Flag] = &[
     &Generate,
     &Glob,
     &GlobCaseInsensitive,
+    &GlobNot,
     &Heading,
     &Help,
     &Hidden,
@@ -2721,6 +2722,93 @@ fn test_glob_case_insensitive() {
     ])
     .unwrap();
     assert_eq!(true, args.glob_case_insensitive);
+}
+
+/// -G/--glob-not
+#[derive(Debug)]
+struct GlobNot;
+
+impl Flag for GlobNot {
+    fn is_switch(&self) -> bool {
+        false
+    }
+    fn name_short(&self) -> Option<u8> {
+        Some(b'G')
+    }
+    fn name_long(&self) -> &'static str {
+        "glob-not"
+    }
+    fn doc_variable(&self) -> Option<&'static str> {
+        Some("GLOB")
+    }
+    fn doc_category(&self) -> Category {
+        Category::Filter
+    }
+    fn doc_short(&self) -> &'static str {
+        r"Exclude files and directories matching GLOB."
+    }
+    fn doc_long(&self) -> &'static str {
+        r#"
+Exclude files and directories for searching that match the given glob. This
+always overrides any other ignore logic. Multiple globs may be used. Globbing
+rules match \fB.gitignore\fP globs. This is equivalent to \fB\-\-glob\fP with
+a \fB!\fP prefix, i.e. \flag{glob-not}\fB=\fP\fIGLOB\fP is the same as
+\fB\-\-glob=!\fP\fIGLOB\fP. If multiple globs match a file or directory, the
+glob given later in the command line takes precedence.
+.sp
+Note that this flag has no effect if a subsequent \flag{glob} or
+\flag{glob-not} flag re-includes a file or directory that this flag excludes.
+"#
+    }
+
+    fn update(&self, v: FlagValue, args: &mut LowArgs) -> anyhow::Result<()> {
+        let glob = convert::string(v.unwrap_value())?;
+        args.globs.push(format!("!{glob}"));
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+#[test]
+fn test_glob_not() {
+    let args = parse_low_raw(None::<&str>).unwrap();
+    assert_eq!(Vec::<String>::new(), args.globs);
+
+    let args = parse_low_raw(["--glob-not", "foo"]).unwrap();
+    assert_eq!(vec!["!foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["--glob-not=foo"]).unwrap();
+    assert_eq!(vec!["!foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["-G", "foo"]).unwrap();
+    assert_eq!(vec!["!foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["-Gfoo"]).unwrap();
+    assert_eq!(vec!["!foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["--glob-not", "-foo"]).unwrap();
+    assert_eq!(vec!["!-foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["--glob-not=-foo"]).unwrap();
+    assert_eq!(vec!["!-foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["-G", "-foo"]).unwrap();
+    assert_eq!(vec!["!-foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["-G-foo"]).unwrap();
+    assert_eq!(vec!["!-foo".to_string()], args.globs);
+
+    let args = parse_low_raw(["-Gfoo", "-gbar", "-Gbaz"]).unwrap();
+    assert_eq!(
+        vec!["!foo".to_string(), "bar".to_string(), "!baz".to_string()],
+        args.globs
+    );
+
+    let args = parse_low_raw(["-g", "foo", "-G", "bar", "-g", "baz"]).unwrap();
+    assert_eq!(
+        vec!["foo".to_string(), "!bar".to_string(), "baz".to_string()],
+        args.globs
+    );
 }
 
 /// --heading
