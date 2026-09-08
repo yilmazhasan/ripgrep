@@ -309,7 +309,7 @@ is a bit non-standard, but it was chosen to be consistent with how globs in
 Since `!` is special to most shells, negated globs given to `-g` typically
 need to be quoted. As a convenience, ripgrep also provides `-G`/`--glob-not`,
 which is exactly the same as `-g` except that it always negates the given
-glob. That is, `-G node_modules` is equivalent to `-g '!node_modules'`, but doesn't
+glob. That is, `-G tests` is equivalent to `-g '!tests'`, but doesn't
 require quoting to protect the `!` from your shell:
 
 ```

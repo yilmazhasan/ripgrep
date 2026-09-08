@@ -257,8 +257,6 @@ rgtest!(file_types_all, |dir: Dir, mut cmd: TestCommand| {
 });
 
 rgtest!(file_types_negate, |dir: Dir, mut cmd: TestCommand| {
-    dir.create("sherlock", SHERLOCK);
-    dir.remove("sherlock");
     dir.create("file.py", "Sherlock");
     dir.create("file.rs", "Sherlock");
     cmd.arg("-T").arg("rust").arg("Sherlock");
@@ -329,8 +327,6 @@ rgtest!(glob, |dir: Dir, mut cmd: TestCommand| {
 });
 
 rgtest!(glob_negate, |dir: Dir, mut cmd: TestCommand| {
-    dir.create("sherlock", SHERLOCK);
-    dir.remove("sherlock");
     dir.create("file.py", "Sherlock");
     dir.create("file.rs", "Sherlock");
     cmd.arg("-g").arg("!*.rs").arg("Sherlock");
