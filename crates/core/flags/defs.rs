@@ -2605,7 +2605,8 @@ impl Flag for Glob {
 Include or exclude files and directories for searching that match the given
 glob. This always overrides any other ignore logic. Multiple glob flags may
 be used. Globbing rules match \fB.gitignore\fP globs. Precede a glob with a
-\fB!\fP to exclude it. If multiple globs match a file or directory, the glob
+\fB!\fP to exclude it, alternatively use "-G" flag for negation.
+If multiple globs match a file or directory, the glob
 given later in the command line takes precedence.
 .sp
 As an extension, globs support specifying alternatives:
@@ -2626,6 +2627,11 @@ a match. For example, if you only want to search in a particular directory
 is incorrect because \fIfoo/bar\fP does not match
 the glob \fIfoo\fP. Instead, you should use
 .BI "\-g '" foo/** '.
+.sp
+Precede a glob with a \fB!\fP and possibly with a quotation, alternatively use
+"-G" flag for negation.
+\flag{glob} value with prefix \fB!\fP is equivalent to \flag{glob-not}, i.e.
+\flag{glob}\fB=!\fP\fIGLOB\fP is the same as \flag{glob-not}\fB=\fP\fIGLOB\fP.
 "#
     }
 

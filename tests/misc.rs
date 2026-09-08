@@ -339,8 +339,6 @@ rgtest!(glob_negate, |dir: Dir, mut cmd: TestCommand| {
 });
 
 rgtest!(glob_not, |dir: Dir, mut cmd: TestCommand| {
-    dir.create("sherlock", SHERLOCK);
-    dir.remove("sherlock");
     dir.create("file.py", "Sherlock");
     dir.create("file.rs", "Sherlock");
     cmd.arg("-G").arg("*.rs").arg("Sherlock");
@@ -349,8 +347,6 @@ rgtest!(glob_not, |dir: Dir, mut cmd: TestCommand| {
 });
 
 rgtest!(glob_not_long, |dir: Dir, mut cmd: TestCommand| {
-    dir.create("sherlock", SHERLOCK);
-    dir.remove("sherlock");
     dir.create("file.py", "Sherlock");
     dir.create("file.rs", "Sherlock");
     cmd.arg("--glob-not").arg("*.rs").arg("Sherlock");
