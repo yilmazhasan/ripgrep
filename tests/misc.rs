@@ -350,6 +350,14 @@ rgtest!(glob_not_long, |dir: Dir, mut cmd: TestCommand| {
     eqnice!("file.py:Sherlock\n", cmd.stdout());
 });
 
+rgtest!(glob_not_negated, |dir: Dir, mut cmd: TestCommand| {
+    dir.create("file.py", "Sherlock");
+    dir.create("file.rs", "Sherlock");
+    cmd.arg("-G").arg("!*.py").arg("Sherlock");
+
+    eqnice!("file.py:Sherlock\n", cmd.stdout());
+});
+
 rgtest!(glob_case_insensitive, |dir: Dir, mut cmd: TestCommand| {
     dir.create("sherlock", SHERLOCK);
     dir.create("file.HTML", "Sherlock");

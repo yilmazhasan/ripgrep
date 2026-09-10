@@ -2769,7 +2769,12 @@ Note that this flag has no effect if a subsequent \flag{glob} or
 
     fn update(&self, v: FlagValue, args: &mut LowArgs) -> anyhow::Result<()> {
         let glob = convert::string(v.unwrap_value())?;
-        args.globs.push(format!("!{glob}"));
+        if glob.starts_with("!") {
+            let glob_unnegated: String = glob[1..].to_string();
+            args.globs.push(glob_unnegated);
+        } else {
+            args.globs.push(format!("!{glob}"));
+        }
         Ok(())
     }
 }
